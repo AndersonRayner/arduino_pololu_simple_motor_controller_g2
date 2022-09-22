@@ -1,25 +1,23 @@
-#include "spool.h"
+#include "motorDriver.h"
 
-SPOOL::SPOOL(TwoWire& SPOOL_I2C, int SPOOL_LIMIT) :
-  _SPOOL_I2C(SPOOL_I2C),
-  _SPOOL_LIMIT(SPOOL_LIMIT)
+motorDriver::motorDriver(TwoWire& i2c_bus) :
+  _i2c_bus(i2c_bus)
 {
     
 }
 
 // Functions for the spool drive
-void SPOOL::init()
+void motorDriver::init()
 {
-  // Set all the spool pins correctly
-  // Software pullups not required as all done in hardware
-  pinMode(_SPOOL_LIMIT,INPUT);
+
+  _i2c_bus.begin();
 
   // Spool initialised
   return;
   
 }
 
-void SPOOL::enable()
+void motorDriver::enable()
 {
 
   // Required to allow motors to move.  Must be called when controller restarts and after any error.
@@ -30,7 +28,7 @@ void SPOOL::enable()
 
   if (_debug >= 2)
   {
-    SERIAL_DEBUG.print("SPOOL\n\t(enable): ");
+    SERIAL_DEBUG.print("motorDriver\n\t(enable): ");
   }
   
   // Send the data
@@ -40,23 +38,23 @@ void SPOOL::enable()
   return;
 }   
 
-void SPOOL::send_buffer(uint8_t buf[], uint8_t len)
+void motorDriver::send_buffer(uint8_t buf[], uint8_t len)
 {
   if (_debug) { SERIAL_DEBUG.print("Sending "); printArray(buf,len); SERIAL_DEBUG.print("\n"); }
 
-  _SPOOL_I2C.beginTransmission(_SPOOL_DRIVE_ADDR);
-  _SPOOL_I2C.write(buf,len);                             
-  _SPOOL_I2C.endTransmission();
+  _i2c_bus.beginTransmission(_SPOOL_DRIVE_ADDR);
+  _i2c_bus.write(buf,len);                             
+  _i2c_bus.endTransmission();
 
   return;
 }
 
-void SPOOL::brake()
+void motorDriver::brake()
 {
   // Debugging
   if (_debug >= 2)
   {
-    SERIAL_DEBUG.print("SPOOL\n\t(brake): ");
+    SERIAL_DEBUG.print("motorDriver\n\t(brake): ");
   }
   
   // Brakes the spool motor at maximum force
@@ -74,14 +72,14 @@ void SPOOL::brake()
   
 }
 
-void SPOOL::set_speed(float drive_speed)
+void motorDriver::set_speed(float drive_speed)
 {    
   // We expect to take in a value of [-1 1] and will map that to [-3200 and 3200] which the motor driver expects
    
   // Debugging
   if (_debug >= 2)
   {
-    SERIAL_DEBUG.print("SPOOL\n\t(set_speed): ");
+    SERIAL_DEBUG.print("motorDriver\n\t(set_speed): ");
   }
 
   // Apply limits
@@ -115,8 +113,6 @@ void SPOOL::set_speed(float drive_speed)
 
   tx_buffer.msg.checksum = checksum(tx_buffer.msgData, sizeof(tx_buffer)-1);
 
-
-
   // Send the command over I2C
   send_buffer(tx_buffer.msgData, sizeof(tx_buffer)-ignore_checksum);
 
@@ -125,46 +121,24 @@ void SPOOL::set_speed(float drive_speed)
   
 }
 
-void SPOOL::check_limit()
-{
-    // Stops the spool if it's on the limit switch
-    if (limit_switch())
-    {        
-            brake();
 
-    }
-    
-    return;
-}
-
-float SPOOL::apply_limits(float drive_speed)
+float motorDriver::apply_limits(float drive_speed)
 {
   // Limit the drive speed to [-1 1]
   drive_speed = constrain(drive_speed,-_max_speed,_max_speed);
 
-  // Limit to only drive out if on the limit switch [-1, 0]
-  if (limit_switch())
-  {
-    drive_speed = constrain(drive_speed,-_max_speed,0.0f);
-  }  
-
+  // Return the limited speed
   return (drive_speed);
     
 }
 
-void SPOOL::set_max_speed(float max_speed)
+void motorDriver::set_max_speed(float max_speed)
 {
     _max_speed = abs(max_speed);
     return;
 }
 
-bool SPOOL::limit_switch()
-{
-    return (0);
-    return (digitalRead(_SPOOL_LIMIT));
-}
-
-uint8_t SPOOL::checksum(uint8_t buf[], uint8_t len)
+uint8_t motorDriver::checksum(uint8_t buf[], uint8_t len)
 {
     
   // Code taken from https://www.pololu.com/docs/0J77/8.13
@@ -184,7 +158,7 @@ uint8_t SPOOL::checksum(uint8_t buf[], uint8_t len)
   return (crc);
 }
 
-void SPOOL::printArray(uint8_t buf[], uint8_t len)
+void motorDriver::printArray(uint8_t buf[], uint8_t len)
 {
   // Prints a buffer in HEX
   for (uint8_t ii = 0; ii < len; ii++)

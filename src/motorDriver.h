@@ -12,10 +12,10 @@
 #define SERIAL_DEBUG Serial
 #endif
 
-class SPOOL {
+class motorDriver {
     public :
         // Constructor
-        SPOOL(TwoWire& SPOOL_I2C, int SPOOL_LIMIT);
+        motorDriver(TwoWire& i2c_bus);
         
         // Functions
         void init();
@@ -34,8 +34,7 @@ class SPOOL {
     private :
         const uint8_t _SPOOL_DRIVE_ADDR = 13;
             
-        TwoWire& _SPOOL_I2C;
-        int _SPOOL_LIMIT;
+        TwoWire& _i2c_bus;
         
         void check_limit();
         float apply_limits(float drive_speed);
