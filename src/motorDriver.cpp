@@ -82,6 +82,12 @@ void motorDriver::set_speed(float drive_speed)
     SERIAL_DEBUG.print("motorDriver\n\t(set_speed): ");
   }
 
+  // Reverse command if required
+  if (invert_)
+  {
+    drive_speed = -drive_speed;
+  }
+
   // Apply limits
   drive_speed = apply_limits(drive_speed);
 

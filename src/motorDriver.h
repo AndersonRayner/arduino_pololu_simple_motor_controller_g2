@@ -27,6 +27,8 @@ class motorDriver {
 
         void set_speed(float drive_speed);
         void set_max_speed(float max_speed);
+
+        void invert() { invert_ = !invert_; }
         
         // Variables
         uint8_t _debug = 0;
@@ -40,6 +42,7 @@ class motorDriver {
         float apply_limits(float drive_speed);
         
         float _max_speed = 1.0f;
+        bool invert_ = false;
 
         // Data transmission
         void send_buffer(uint8_t buf[], uint8_t len);
