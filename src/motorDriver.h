@@ -21,6 +21,7 @@ class motorDriver {
         void init();
      
         void enable(); 
+        void disable();
         void brake();
         
         bool limit_switch();

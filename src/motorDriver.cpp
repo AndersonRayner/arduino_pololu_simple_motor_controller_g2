@@ -144,6 +144,14 @@ void motorDriver::set_max_speed(float max_speed)
     return;
 }
 
+void motorDriver::disable()
+{
+    // This should actually send the disable command
+    set_speed(0.0f);
+
+    return;
+}
+
 uint8_t motorDriver::checksum(uint8_t buf[], uint8_t len)
 {
     
