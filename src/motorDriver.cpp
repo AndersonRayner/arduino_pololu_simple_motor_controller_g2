@@ -107,8 +107,7 @@ void motorDriver::set_speed(float drive_speed)
   // =============== Map the drive speed here =====================
   drive_speed = drive_speed * 3200;
 
-   int16_t _speed = (int16_t) drive_speed;
-
+  int16_t _speed = (int16_t) drive_speed;
 
   tx_buffer.msg.drive_speed = 0x1F08;
   tx_buffer.msg.drive_speed = _speed;
