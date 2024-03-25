@@ -29,6 +29,8 @@ class motorDriver {
         void set_speed(float drive_speed);
         void set_max_speed(float max_speed);
 
+        float get_cmd() { return last_cmd_; }
+
         void invert() { invert_ = !invert_; }
         
         // Variables
@@ -43,6 +45,7 @@ class motorDriver {
         float apply_limits(float drive_speed);
         
         float _max_speed = 1.0f;
+        float last_cmd_ = 0.0f;
         bool invert_ = false;
 
         // Data transmission

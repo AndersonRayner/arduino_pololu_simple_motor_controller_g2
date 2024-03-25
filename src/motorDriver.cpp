@@ -91,6 +91,9 @@ void motorDriver::set_speed(float drive_speed)
   // Apply limits
   drive_speed = apply_limits(drive_speed);
 
+  // Update global of last speed sent
+  last_cmd_ = drive_speed;
+
   // Assemble the drive packet
   spool_drive_data tx_buffer;
   
