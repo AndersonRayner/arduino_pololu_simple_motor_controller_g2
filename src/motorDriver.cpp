@@ -72,35 +72,35 @@ void motorDriver::brake()
   
 }
 
-void motorDriver::set_speed(float drive_speed)
+void motorDriver::set_effort(float effort)
 {    
   // We expect to take in a value of [-1 1] and will map that to [-3200 and 3200] which the motor driver expects
    
   // Debugging
   if (_debug >= 2)
   {
-    SERIAL_DEBUG.print("motorDriver\n\t(set_speed): ");
+    SERIAL_DEBUG.print("motorDriver\n\t(set_effort): ");
   }
 
   // Reverse command if required
   if (invert_)
   {
-    drive_speed = -drive_speed;
+    effort = -effort;
   }
 
   // Apply limits
-  drive_speed = apply_limits(drive_speed);
+  effort = apply_limits(effort);
 
   // Update global of last speed sent
-  last_cmd_ = drive_speed;
+  last_cmd_ = effort;
 
   // Assemble the drive packet
   spool_drive_data tx_buffer;
   
-  if (drive_speed < 0.0f)
+  if (effort < 0.0f)
   {
     tx_buffer.msg.header = 0x86; // Motor reverse
-    drive_speed = -drive_speed;
+    effort = -effort;
     
   } else {
     tx_buffer.msg.header = 0x85; // Motor forward
@@ -108,9 +108,9 @@ void motorDriver::set_speed(float drive_speed)
   }
 
   // =============== Map the drive speed here =====================
-  drive_speed = drive_speed * 3200;
+  effort = effort * 3200;
 
-  int16_t _speed = (int16_t) drive_speed;
+  int16_t _speed = (int16_t) effort;
 
   tx_buffer.msg.drive_speed = 0x1F08;
   tx_buffer.msg.drive_speed = _speed;
@@ -130,26 +130,26 @@ void motorDriver::set_speed(float drive_speed)
 }
 
 
-float motorDriver::apply_limits(float drive_speed)
+float motorDriver::apply_limits(float effort)
 {
   // Limit the drive speed to [-1 1]
-  drive_speed = constrain(drive_speed,-_max_speed,_max_speed);
+  effort = constrain(effort,-_max_effort,_max_effort);
 
   // Return the limited speed
-  return (drive_speed);
+  return (effort);
     
 }
 
-void motorDriver::set_max_speed(float max_speed)
+void motorDriver::set_max_effort(float max_speed)
 {
-    _max_speed = abs(max_speed);
+    _max_effort = abs(max_speed);
     return;
 }
 
 void motorDriver::disable()
 {
     // This should actually send the disable command
-    set_speed(0.0f);
+    set_effort(0.0f);
 
     return;
 }

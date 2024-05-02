@@ -26,8 +26,8 @@ class motorDriver {
         
         bool limit_switch();
 
-        void set_speed(float drive_speed);
-        void set_max_speed(float max_speed);
+        void set_effort(float effort);
+        void set_max_effort(float max_effort);
 
         float get_cmd() { return last_cmd_; }
 
@@ -42,9 +42,9 @@ class motorDriver {
         TwoWire& _i2c_bus;
         
         void check_limit();
-        float apply_limits(float drive_speed);
+        float apply_limits(float effort);
         
-        float _max_speed = 1.0f;
+        float _max_effort = 1.0f;
         float last_cmd_ = 0.0f;
         bool invert_ = false;
 
